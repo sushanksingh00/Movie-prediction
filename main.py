@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import pickle
 import requests
 import urllib.parse
+import os
 
 
 similarity_mat = pickle.load(open("similarity.pkl", "rb"))
@@ -52,7 +53,7 @@ def recommend_api(movie: str):
     return recommend(movie)
      
 
-API_KEY = "47ccc6b6fe76986e304586db8b35fe02"
+API_KEY = os.getenv("API_KEY")
 
 
 def get_details(title):
