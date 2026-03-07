@@ -7,6 +7,9 @@ import os
 import time
 import pickle
 
+from fastapi.middleware.cors import CORSMiddleware
+
+
 import pandas as pd
 
 MOVIES_URL = "https://github.com/sushanksingh00/Movie-prediction/releases/download/v1/movies.pkl"
@@ -31,6 +34,14 @@ similarity_mat = pickle.load(open("similarity.pkl", "rb"))
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 origins = [
     "http://localhost:5500",
