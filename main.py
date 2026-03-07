@@ -1,12 +1,21 @@
 from fastapi import FastAPI
-import pickle
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 import urllib.parse
 import os
+import time
 
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import CountVectorizer
 
-similarity_mat = pickle.load(open("similarity.pkl", "rb"))
-df = pickle.load(open("movies.pkl", "rb"))
+df = pd.read_csv("data/processed/final_features_with_tags.csv")
+
+cv = CountVectorizer(max_features=5000, stop_words="english")
+vectors = cv.fit_transform(df["tags"]).toarray()
+
+similarity_mat = cosine_similarity(vectors)
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -55,17 +64,26 @@ def recommend_api(movie: str):
 
 API_KEY = os.getenv("API_KEY")
 
+if API_KEY == None:
+    raise ValueError("API_KEY is not set in environment variables")
+
+
+session = requests.Session()
+retry = Retry(total=3, backoff_factor=0.5, status_forcelist=[429, 500, 502, 503, 504])
+session.mount("https://", HTTPAdapter(max_retries=retry))
+
 
 def get_details(title):
 
     title = urllib.parse.quote(title)
     url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={title}"
     try:
-        response = requests.get(
+        response = session.get(
             url,
             headers={"User-Agent": "Mozilla/5.0"},
             timeout=5
         )
+        time.sleep(0.25)
         data = response.json()
         if "results" not in data or len(data["results"]) == 0:
             return None
@@ -82,5 +100,6 @@ def get_details(title):
             "poster": poster
         }
     except Exception as e:
+        print(API_KEY)
         print("TMDb API error:", e)
         return None
