@@ -5,17 +5,28 @@ from urllib3.util.retry import Retry
 import urllib.parse
 import os
 import time
+import pickle
 
 import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import CountVectorizer
 
-df = pd.read_csv("data/processed/final_features_with_tags.csv")
+MOVIES_URL = "https://github.com/sushanksingh00/Movie-prediction/releases/download/v1/movies.pkl"
+SIMILARITY_URL = "https://github.com/sushanksingh00/Movie-prediction/releases/download/v1/similarity.pkl"
 
-cv = CountVectorizer(max_features=5000, stop_words="english")
-vectors = cv.fit_transform(df["tags"]).toarray()
 
-similarity_mat = cosine_similarity(vectors)
+def download_file(url, filename):
+    r = requests.get(url)
+    with open(filename, "wb") as f:
+        f.write(r.content)
+
+
+if not os.path.exists("movies.pkl"):
+    download_file(MOVIES_URL, "movies.pkl")
+
+if not os.path.exists("similarity.pkl"):
+    download_file(SIMILARITY_URL, "similarity.pkl")
+
+df = pickle.load(open("movies.pkl", "rb"))
+similarity_mat = pickle.load(open("similarity.pkl", "rb"))
 
 from fastapi.middleware.cors import CORSMiddleware
 
