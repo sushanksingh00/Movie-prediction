@@ -38,7 +38,7 @@
         async function getRecommendations(){
 
             let movie = document.getElementById("MovieName").value;
-            const response = await fetch(`http://127.0.0.1:8000/recommend?movie=${encodeURIComponent(movie)}`);
+            const response = await fetch(`https://movie-prediction-yyqm.onrender.com/recommend?movie=${encodeURIComponent(movie)}`);
             const data = await response.json();
             document.getElementById("results").innerHTML = "";
 
