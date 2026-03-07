@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie-Recommendation</title>
+    <style>
+        .results{
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap:10px;
+        }
+        .item{
+            width: 16%;
+            text-align: center;
+        }
+        .input{
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .input input{
+            padding: 10px 15px;
+            font-size: 16px;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="input">
+        <input  id="MovieName" textarea="type your movie">
+        <button onclick="getRecommendations()">Search</button>
+    </div>
+    <div class="results" id="results">
+    </div>
+    <script>
+        async function getRecommendations(){
+
+            let movie = document.getElementById("MovieName").value;
+            const response = await fetch(`http://127.0.0.1:8000/recommend?movie=${encodeURIComponent(movie)}`);
+            const data = await response.json();
+            document.getElementById("results").innerHTML = "";
+
+            data.forEach(movie => {
+                let card = `
+                <div class="item">
+                    <img src="${movie.poster} width="100" height="300">
+                    <h3>${movie.title}</h3>
+                    <p>Rating - ${movie.rating}/10</p>
+                    <p>${movie.overview}</p>
+                </div>
+                `;
+                document.getElementById("results").innerHTML += card;
+            });
+        }
+    </script>
+</body>
+</html>
