@@ -42,6 +42,11 @@
             const data = await response.json();
             document.getElementById("results").innerHTML = "";
 
+            if (data.error) {
+                document.getElementById("results").innerHTML = `<p>${data.error}</p>`;
+                return;
+            }
+
             data.forEach(movie => {
                 let card = `
                 <div class="item">

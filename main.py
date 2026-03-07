@@ -81,6 +81,8 @@ def recommend(movie):
 
 @app.get("/recommend")
 def recommend_api(movie: str):
+    if df[df["title"] == movie].empty:
+        return {"error": "Movie does not exist in the database. Try copying the exact name from Google or search a different one."}
     return recommend(movie)
      
 
